@@ -1,33 +1,54 @@
-<h1>Listing contacts</h1>
 
-<table>
-  <tr>
-    <th>Photo</th>
-    <th>Name</th>
-    <th>Address</th>
-    <th>Tel</th>
-    <th>Email</th>
-    <th>Type</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
+<div id="contacts">
+  <header>
+    <div id="filter"><label>Show me:</label></div>
+    <a id="showForm" href="#">Add new contact</a>
+  </header>
 
-<% @contacts.each do |contact| %>
-  <tr>
-    <td><%= contact.photo %></td>
-    <td><%= contact.name %></td>
-    <td><%= contact.address %></td>
-    <td><%= contact.tel %></td>
-    <td><%= contact.email %></td>
-    <td><%= contact.type %></td>
-    <td><%= link_to 'Show', contact %></td>
-    <td><%= link_to 'Edit', edit_contact_path(contact) %></td>
-    <td><%= link_to 'Destroy', contact, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-  </tr>
-<% end %>
-</table>
+  <!-- Form to add a new contact -->
+  <form id="addContact" action="#">
+    <!--NOTE!: make sure id attributes match the attributes of the contact model.
+Makes life easier that way-->
+    <label for="photo">Photo:</label><input id="photo" type="file" />
+    <label for="type">Type:</label><input id="type" />
+    <label for="name">Name:</label><input id="name" />
+    <label for="address">Address:</label><input id="address" />
+    <label for="tel">Tel:</label><input id="tel" />
+    <label for="email">Email:</label><input id="email" />
+    <button id="add">Add</button>
+  </form>
+</div>
 
-<br />
+<!-- Contact template
+The {{ }} will be replace by the attributes of a Contact model -->
+<!-- Use custom "type" attribute so the browser doesn't try to execute it
+without a custom type it will think that it is javascript to execute -->
+<script id="contactTemplate" type="text/template">
+  <img src="{{ photo }}" alt="{{ name }}" />
+  <h1>{{ name }}<span>{{ type }}</span></h1>
+  <div>{{ address }}</div>
+  <dl>
+    <dt>Tel:</dt><dd>{{ tel }}</dd>
+    <dt>Email:</dt><dd><a href="mailto:{{ email}}">{{ email }}</a></dd>
+  </dl>
+  <button class="delete">Delete</button>
+  <button class="edit">Edit</button>
+</script>
 
-<%= link_to 'New Contact', new_contact_path %>
+<!-- Edit contact template -->
+<script id="contactEditTemplate" type="text/template">
+  <form action="#">
+    <input type="file" value="{{ photo }}" />
+    <input class="name" value="{{ name }}" />
+    <input id="type" type="hidden" value="{{ type }}" />
+    <input class="address" value="{{ address }}" />
+    <input class="tel" value="{{ tel }}" />
+    <input class="email" value="{{ email }}" />
+    <button class="save">Save</button>
+    <button class="cancel">Cancel</button>
+  </form>
+</script>
+
+<script type="text/javascript">
+  var placeHolderImagePath = "<%= asset_path 'placeholder.png' %>";
+</script>

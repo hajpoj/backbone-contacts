@@ -1,3 +1,48 @@
 // Place all the styles related to the contacts controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.contact-container {
+  display: inline-block;
+  background-color: #e0ffff;
+  border: 1px solid #00ffff;
+  width: 450px;
+  margin: 10px;
+}
+
+.contact-container img {
+  float: left;
+  margin: 10px;
+}
+
+.contact-container h1 {
+  margin: 10px 0 0 0;
+}
+
+.contact-container h1 span {
+  float:right;
+  font-size: 12px;
+  margin: 0 10px 0 0;
+}
+
+.contact-container dl {
+  margin: 10px 0 0 0;
+}
+
+.contact-container dt {
+  display: inline;
+}
+
+.contact-container dd {
+  display: inline;
+  margin-left: 10px;
+}
+
+.contact-container dd:after {
+  content: "\A";
+  white-space: pre;
+}
+
+#addContact {
+  display: none;
+}
