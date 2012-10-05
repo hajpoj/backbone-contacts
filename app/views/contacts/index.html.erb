@@ -51,4 +51,6 @@ without a custom type it will think that it is javascript to execute -->
 
 <script type="text/javascript">
   var placeHolderImagePath = "<%= asset_path 'placeholder.png' %>";
+  var contacts = <%= @contacts.to_json.html_safe %>;
+  var contact = <%= @contacts[0].to_json.html_safe %>;
 </script>

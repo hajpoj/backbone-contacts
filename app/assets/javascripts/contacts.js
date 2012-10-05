@@ -6,18 +6,6 @@ $(function() {
     interpolate : /\{\{(.+?)\}\}/g
   };
 
-  //Sample data. Using this instead of getting data from the backend servers.
-  var contacts = [
-    { name: "Contact 1", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" },
-    { name: "Contact 2", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" },
-    { name: "Contact 3", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "friend" },
-    { name: "Contact 4", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "colleague" },
-    { name: "Contact 5", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" },
-    { name: "Contact 6", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "colleague" },
-    { name: "Contact 7", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "friend" },
-    { name: "Contact 8", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" }
-  ];
-
   // Can create a new model with the Backbone.Model.extend function. Takes an
   // object as a parameter that allows us to customize the model
   var Contact = Backbone.Model.extend({
@@ -25,7 +13,7 @@ $(function() {
     //define a defaults property (an object as a value) to specify some of the
     //default attributes you want the model to have.
     defaults: {
-      photo: placeHolderImagePath,
+      photo: "",
       name: "",
       address: "",
       tel: "",
@@ -39,7 +27,8 @@ $(function() {
   var Directory = Backbone.Collection.extend({
 
     // Set "model" property to define what the collection is of.
-    model: Contact
+    model: Contact,
+    url: '/contacts'
   });
 
   // Define a view
@@ -51,8 +40,12 @@ $(function() {
     className: "contact-container",
 
     // Specify a template for the view
-    template: $("#contactTemplate").html(),
-    editTemplate:_.template($('#contactEditTemplate').html()),
+    template: _.template($("#contactTemplate").html()),
+    editTemplate: _.template($('#contactEditTemplate').html()),
+
+    initialize: function() {
+      this.model.on("sync", this.syncComplete, this);
+    },
 
     // Define a render method that will create the html and then set it to this.el
     // this function does not add it to the DOM, in this case. Once the element (el)
@@ -60,14 +53,20 @@ $(function() {
     render: function() {
 
       // uses the _.template method to create a template
-      var tmpl = _.template(this.template);
-
-      // add date to the template
-      this.$el.html(tmpl(this.model.toJSON()));
-
+      this.$el.html(this.template(this.jsonForTemplate()));
       // return this to allow chaining. (which is the view object that the render
       // method was called on
       return this;
+    },
+
+    // returns a modified model json object, that adds a default photo if the model
+    // doesn't have one. Use this json object when rendering a template.
+    jsonForTemplate: function() {
+      var jsonModel = this.model.toJSON();
+      if(jsonModel.photo === null || jsonModel.photo === "") {
+        jsonModel.photo = placeHolderImagePath;
+      }
+      return jsonModel;
     },
 
     events: {
@@ -149,14 +148,14 @@ $(function() {
       }
 
       // set the model attributes
-      this.model.set(formData);
+      this.model.set(formData).save();
       // render the model view
       this.render();
 
       // this just again just removed so because "images/placeholder.png" is the default value
       // for photos and the following comparisons would fail otherwise
       if(prev.photo === placeHolderImagePath) {
-        delete prev.photo;
+        prev.photo = null;
       }
 
       // go through the contacts array and replace the contact with the new data.
@@ -208,6 +207,8 @@ $(function() {
       // When something is removed from the collection, remove it from the original array.
       // usually we would remove it from the server.
       this.collection.on("remove", this.removeContact, this);
+
+      this.collection.on("sync", this.syncComplete, this);
     },
 
     // Render function
@@ -244,7 +245,8 @@ $(function() {
     // pluck is a simple way to create an array of a single attribute from a
     // collection of objects.
     getTypes: function() {
-      return _.uniq(this.collection.pluck("type"), false, function(type) {
+      var collection = new Directory(contacts);
+      return _.uniq(collection.pluck("type"), false, function(type) {
         return type.toLowerCase();
       });
     },
@@ -323,18 +325,15 @@ $(function() {
       });
 
       // add the new contact object to the contacts array. Typically we would save
-      // this data to the server.
+      // this data to the server. Basically contacts maintains a synced version of
+      // of all the contacts available.
       contacts.push(newContact);
 
-      // check to see if the contact has a new type. If it does then we have to
-      // recreate a new filter selector with the new type in it.
-      // Otherwise just add the new Contact to the directory.collection.
-      if(_.indexOf(this.getTypes(), newContact.type) === -1) {
-        this.collection.add(new Contact(newContact));
-        this.$el.find('#filter').find("select").remove().end().append(this.createSelected());
-      } else {
-        this.collection.add(new Contact(newContact));
-      }
+      // create a new filter based off of new contact type
+      this.$el.find('#filter').find("select").remove().end().append(this.createSelected());
+
+      // create a new contact and push to server. will trigger a sync method
+      this.collection.create(newContact);
     },
 
     // show / hide the add new contact form.
@@ -362,6 +361,12 @@ $(function() {
           contacts.splice(_.indexOf(contacts, contact), 1);
         }
       });
+    },
+
+    // if a model is part of a collection then the sync event handler on
+    // the collection is triggered even when a model is edited
+    syncComplete: function(e) {
+      alert("synced");
     }
   });
 

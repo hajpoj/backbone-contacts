@@ -1,5 +1,8 @@
 BackboneContacts::Application.routes.draw do
+
+  get 'contacts/all'
   resources :contacts
+
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
