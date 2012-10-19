@@ -1,6 +1,6 @@
 == Contacts app with Backbone.js
 
-Contacts app built with backbone.js then integrated to the server with rails.
+Contacts app built with backbone.js then integrated with a rails backend.
 
 Based on a Net tuts tutorial (highly recommended)!:
 link:http://net.tutsplus.com/tutorials/javascript-ajax/build-a-contacts-manager-using-backbone-js-part-1/

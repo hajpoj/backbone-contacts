@@ -6,6 +6,12 @@ $(function() {
     interpolate : /\{\{(.+?)\}\}/g
   };
 
+
+  //***************************************************************************
+  // =Contact Model
+  //***************************************************************************
+
+
   // Can create a new model with the Backbone.Model.extend function. Takes an
   // object as a parameter that allows us to customize the model
   var Contact = Backbone.Model.extend({
@@ -22,6 +28,12 @@ $(function() {
     }
   });
 
+
+  //***************************************************************************
+  // =Directory Collection (Collection of Models)
+  //***************************************************************************
+
+
   // Use collections to define collections of models. In this case Directory is
   // a collection of Contacts. Again takes an object as a parameter.
   var Directory = Backbone.Collection.extend({
@@ -30,6 +42,12 @@ $(function() {
     model: Contact,
     url: '/contacts'
   });
+
+
+  //***************************************************************************
+  // =ContactView
+  //***************************************************************************
+
 
   // Define a view
   var ContactView = Backbone.View.extend({
@@ -172,6 +190,12 @@ $(function() {
       this.render();
     }
   });
+
+
+  //***************************************************************************
+  // =DirectoryView
+  //***************************************************************************
+
 
   // Define a second view for the Directory collection.
   var DirectoryView = Backbone.View.extend({
@@ -370,6 +394,12 @@ $(function() {
     }
   });
 
+
+  //***************************************************************************
+  // =Router
+  //***************************************************************************
+
+
   // Create a custom route where you can set the filter with the url.
   var ContactsRouter = Backbone.Router.extend({
     routes: {
@@ -386,6 +416,12 @@ $(function() {
       alert("hello!");
     }
   });
+
+
+  //***************************************************************************
+  // =Startup code.
+  //***************************************************************************
+
 
   // instantiate a DirectoryView (and hence have it inserted into the DOM).
   var directory = new DirectoryView();
