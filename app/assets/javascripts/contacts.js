@@ -281,7 +281,7 @@ $(function() {
       "click #showForm": "showForm"
     },
 
-    // this setFilter event handler is called when the change event happes on the
+    // this setFilter event handler is called when the change event happens on the
     // "#filter select" object.
     setFilter: function(e) {
 
@@ -294,6 +294,11 @@ $(function() {
 
     //filter the collection by the saved filterType
     filterByType: function() {
+
+      // if the user directly types in the filter URL instead of using the selector
+      // make sure the selector is correct
+      this.$filter.find('select').val(this.filterType);
+
       this.render(this.filterType);
       //set the url
       contactsRouter.navigate("filter/" + this.filterType);
