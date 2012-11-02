@@ -28,7 +28,6 @@ $(function() {
     }
   });
 
-
   //***************************************************************************
   // =Directory Collection (Collection of Models)
   //***************************************************************************
@@ -100,17 +99,12 @@ $(function() {
 
     //delete a contact
     deleteContact: function() {
-      var removedType = this.model.get("type").toLowerCase();
       // delete the model (usually would delete on the server also)
       this.model.destroy();
-      // remove the view from the DOM
+      // remove the view from the DOM, and remove all bound events to it
       this.remove();
-      // if the list of contacts types is reduced, then update the type's filter.
-      if(_.indexOf(directory.getTypes(), removedType) === -1) {
-        directory.$el.find("#filter select").children("[value='" + removedType +"']").remove();
-      }
-
-      //after this the contacts object array is also has the contact removed.
+      // removed all bound events to the ContactsView
+      this.off();
     },
 
     //add the edit contact form to the view.
@@ -146,8 +140,7 @@ $(function() {
 
     saveEdits: function(e) {
       e.preventDefault();
-      var formData = {},
-        prev = this.model.previousAttributes();
+      var formData = {};
 
       // the ":input" is a jquery selector that allows you to select all input, textarea,
       // select, and button elements.
@@ -159,30 +152,12 @@ $(function() {
         formData[el.attr("class")] = el.val();
       });
 
-      //delete photo attribute if it is null so that the default photo is used.
-      if(formData.photo === "") {
-        //delete is for deleting properties of a object.
-        delete formData.photo;
-      }
-
       // set the model attributes
       this.model.set(formData).save();
       // render the model view
       this.render();
-
-      // this just again just removed so because "images/placeholder.png" is the default value
-      // for photos and the following comparisons would fail otherwise
-      if(prev.photo === placeHolderImagePath) {
-        prev.photo = null;
-      }
-
-      // go through the contacts array and replace the contact with the new data.
-      _.each(contacts, function(contact) {
-        if(_.isEqual(contact, prev)) {
-          // this splice removes 1 element and adds the formData object
-          contacts.splice(_.indexOf(contacts, contact), 1, formData)
-        }
-      });
+      // update directory filter
+      directory.renderFilter();
     },
 
     // cancel edits. All edits are disregarded and the old model is rendered again.
@@ -200,68 +175,68 @@ $(function() {
   // Define a second view for the Directory collection.
   var DirectoryView = Backbone.View.extend({
 
-    //store the DOM element associated with this View.
+    // store the DOM element associated with this View.
     el: $('#contacts'),
+    // store the Directory filter element on the page
+    $filter: $('#filter'),
 
     // Initialize function. this is run immediately when a new instance of this object
     // is created.
     initialize: function() {
+      var that = this;
       // associate this view with the Directory collection. Also create a new directory
       // collection given the JSON array of contacts. Each object from the contacts array
       // is used to create the Contact models in the Directory collection
       this.collection = new Directory(contacts);
 
+      // array of contact views for models in the Directory collection
+      this.contactViews = [];
+      this.collection.each(function(contact){
+        var cv = new ContactView({
+          model: contact
+        });
+        that.contactViews.push(cv);
+      });
+
       //Render view when a DirectoryView object is created
       this.render();
-
-      //Add type selector to the page
-      this.$el.find('#filter').append(this.createSelected());
+      this.renderFilter();
 
       // Bind an event handler on the change:filterType event. When the event is triggered
       // call the filterByType method.
       this.on("change:filterType", this.filterByType, this);
 
-      //on the reset event, run the render function
-      this.collection.on("reset", this.render, this);
-
-      // when something is added to the collection, set renderContact as the event handler,
-      // which will render the item added to the collection
-      this.collection.on("add", this.renderContact, this);
-
-      // When something is removed from the collection, remove it from the original array.
-      // usually we would remove it from the server.
-      this.collection.on("remove", this.removeContact, this);
-
       this.collection.on("sync", this.syncComplete, this);
+      //callbacks to sync contactViews array
+      this.collection.on('add', this.contactAdded, this);
+      this.collection.on('remove', this.contactRemoved, this);
+
+      // callbacks to re-render the filter whenever a contact is added or removed
+      this.collection.on('add', this.renderFilter, this);
+      this.collection.on('remove', this.renderFilter, this);
     },
 
     // Render function
-    render: function() {
+    render: function(filter) {
       var that = this;
 
       //remove all contacts before adding them
-      this.$el.find("article").remove();
+      this.$el.find("article").detach();
 
-      // loop through the models in the Directory collection and run the renderContact
-      // function
-      _.each(this.collection.models, function(item) {
-        that.renderContact(item);
-      }, this);
-
-      //could do this.collection.each instead of _.each.
-    },
-
-    // Function to render each individual contact
-    renderContact: function(item) {
-
-      // Create contact views, and set the model to be the Contact Model from the
-      // Directory collection.
-      var contactView = new ContactView({
-        model: item
-      });
-
-      // Render the contactView and insert it into the DOM.
-      this.$el.append(contactView.render().el);
+      // only show contacts that match the filter
+      if(filter && filter !== "all") {
+        _.each(this.contactViews, function(contact){
+          if(contact.model.get("type") === filter) {
+            that.$el.append(contact.render().el);
+          }
+        })
+      }
+      else {
+        // show all contacts
+        _.each(this.contactViews, function(contact) {
+          that.$el.append(contact.render().el);
+        });
+      }
     },
 
     // Get an array of unique types from the list of contacts. Look at documentation
@@ -269,15 +244,13 @@ $(function() {
     // pluck is a simple way to create an array of a single attribute from a
     // collection of objects.
     getTypes: function() {
-      var collection = new Directory(contacts);
-      return _.uniq(collection.pluck("type"), false, function(type) {
+      return _.uniq(this.collection.pluck("type"), false, function(type) {
         return type.toLowerCase();
       });
     },
 
     //Create the html selector
     createSelected: function() {
-      //var filter = this.$el.find('#filter'), // not used anywhere.
 
       // this uses the jquery selector to create a new html select element
       // docs: http://api.jquery.com/jQuery/#jQuery2
@@ -293,6 +266,11 @@ $(function() {
         }).appendTo(select);
       });
       return select;
+    },
+
+    renderFilter: function() {
+      this.$filter.empty();
+      this.$filter.append(this.createSelected());
     },
 
     //Set up event handlers
@@ -316,22 +294,9 @@ $(function() {
 
     //filter the collection by the saved filterType
     filterByType: function() {
-      if(this.filterType === "all") {
-        this.collection.reset(contacts);
-        //set the url
-        contactsRouter.navigate("filter/all");
-      } else {
-        this.collection.reset(contacts, {silent: true});
-        //create a filtered collection of models
-        var filterType = this.filterType,
-          filtered = _.filter(this.collection.models, function(item) {
-            return item.get("type").toLowerCase() === filterType;
-          });
-        //reset the collection to only contain the filtered elements.
-        this.collection.reset(filtered);
-        //set the url
-        contactsRouter.navigate("filter/" + filterType);
-      }
+      this.render(this.filterType);
+      //set the url
+      contactsRouter.navigate("filter/" + this.filterType);
     },
 
     // Event handler when the add Contact form "add" button is clicked
@@ -348,11 +313,6 @@ $(function() {
         }
       });
 
-      // add the new contact object to the contacts array. Typically we would save
-      // this data to the server. Basically contacts maintains a synced version of
-      // of all the contacts available.
-      contacts.push(newContact);
-
       // create a new filter based off of new contact type
       this.$el.find('#filter').find("select").remove().end().append(this.createSelected());
 
@@ -365,32 +325,33 @@ $(function() {
       this.$el.find('#addContact').slideToggle();
     },
 
-    // remove contact from the contacts array after it was delete from the Directory
-    // collection.
-    removeContact: function(removedModel) {
-      var removed = removedModel.attributes;
-
-      // remove the photo attribute because all the items in the contacts array
-      // do not have a photo attribute (they all inherit it as a default). If we
-      // don't remove the photo attribute, all our comparisons will fail.
-      if (removed.photo === placeHolderImagePath) {
-        delete removed.photo;
-      }
-
-      // remove removed contact from contacts array
-      _.each(contacts, function(contact) {
-        if(_.isEqual(contact, removed)) {
-          // Use splice to remove items from a javascript array
-          // http://stackoverflow.com/questions/500606/javascript-array-delete-elements
-          contacts.splice(_.indexOf(contacts, contact), 1);
-        }
+    // callback for collection.add event
+    // For the contact added to the collection, add a ContactView to the ContactViews
+    // array and render it
+    contactAdded: function(contact) {
+      var cv = new ContactView({
+        model: contact
       });
+      //add to the contactsViews array
+      this.contactViews.push(cv);
+      this.$el.append(cv.render().el);
+    },
+
+    // callback for collection.remove event
+    // For the removed contact, remove the associated ContactView from the ContactViews
+    // array
+    contactRemoved: function (model) {
+      var toRemove = _.find(this.contactViews, function(view) {
+        return view.model === model;
+      });
+      //remove from the contactsViews array
+      this.contactViews.splice(this.contactViews.indexOf(toRemove), 1);
     },
 
     // if a model is part of a collection then the sync event handler on
     // the collection is triggered even when a model is edited
     syncComplete: function(e) {
-      alert("synced");
+      console.log("synced");
     }
   });
 
