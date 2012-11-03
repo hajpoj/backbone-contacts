@@ -54,7 +54,7 @@ $(function() {
     tagName: "article",
 
     // Specifies a class name added to container
-    className: "contact-container",
+    className: "contact-container span4",
 
     // Specify a template for the view
     template: _.template($("#contactTemplate").html()),
@@ -310,7 +310,7 @@ $(function() {
       var newContact = {}; //empty contact
 
       //get the inputs from the new contact form and create a new object with them.
-      $('#addContact').children("input").each(function(i, el) {
+      $('#addContact').find("input").each(function(i, el) {
         //el is the element. Check to make sure that it is not blank.
         if($(el).val() !== "") {
           //set new key value pairs a new contact.

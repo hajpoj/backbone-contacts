@@ -1,52 +1,113 @@
+<div class="navbar navbar-fixed-top">
 
-<div id="contacts">
-  <header>
-    <div id="filter"><label>Show me:</label></div>
-    <a id="showForm" href="#">Add new contact</a>
-  </header>
+  <div class="navbar-inner">
+    <div class="container">
+    <div class="brand">Contacts App</div>
+    </div>
+  </div>
 
-  <!-- Form to add a new contact -->
-  <form id="addContact" action="#">
-    <!--NOTE!: make sure id attributes match the attributes of the contact model.
-Makes life easier that way-->
-    <label for="photo">Photo:</label><input id="photo" type="file" />
-    <label for="type">Type:</label><input id="type" />
-    <label for="name">Name:</label><input id="name" />
-    <label for="address">Address:</label><input id="address" />
-    <label for="tel">Tel:</label><input id="tel" />
-    <label for="email">Email:</label><input id="email" />
-    <button id="add">Add</button>
-  </form>
 </div>
+
+<div class="container">
+  <div id="contacts" class="row">
+    <div class="span12">
+      <div class="well">
+        Filter:
+        <div id="filter">
+          <label>Show me:</label>
+        </div>
+        <a id="showForm" class="btn" href="#"><i class="icon-plus"></i>&nbsp;&nbsp;New Contact</a>
+        <!-- Form to add a new contact -->
+        <form id="addContact" class="form-horizontal" action="#">
+          <!--NOTE!: make sure id attributes match the attributes of the contact model.
+      Makes life easier that way-->
+          <div class="control-group">
+            <label class="control-label" for="photo">Photo:</label>
+            <div class="controls">
+              <input id="photo" type="file" disabled="disabled"/>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"  for="type">Type:</label>
+            <div class="controls">
+              <input id="type" type="text"/>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"  for="name">Name:</label>
+            <div class="controls">
+              <input id="name" type="text"/>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"  for="address">Address:</label>
+            <div class="controls">
+              <input id="address" type="text"/>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"  for="tel">Tel:</label>
+            <div class="controls">
+              <input id="tel" type="text"/>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"  for="email">Email:</label>
+            <div class="controls">
+              <input id="email" type="text" />
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <button id="add" class="btn btn-primary">Add</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- Contact template
 The {{ }} will be replace by the attributes of a Contact model -->
 <!-- Use custom "type" attribute so the browser doesn't try to execute it
 without a custom type it will think that it is javascript to execute -->
 <script id="contactTemplate" type="text/template">
-  <img src="{{ photo }}" alt="{{ name }}" />
-  <h1>{{ name }}<span>{{ type }}</span></h1>
-  <div>{{ address }}</div>
-  <dl>
-    <dt>Tel:</dt><dd>{{ tel }}</dd>
-    <dt>Email:</dt><dd><a href="mailto:{{ email}}">{{ email }}</a></dd>
-  </dl>
-  <button class="delete">Delete</button>
-  <button class="edit">Edit</button>
+  <div class="well">
+    <div class="clearfix">
+    <img src="{{ photo }}" alt="{{ name }}" />
+    <h1>{{ name }}</h1>
+    <div>{{ address }}</div>
+    </div>
+    <dl>
+      <dt>Type:</dt><dd>{{type}}</dd>
+      <dt>Tel:</dt><dd>{{ tel }}</dd>
+      <dt>Email:</dt><dd><a href="mailto:{{ email}}">{{ email }}</a></dd>
+    </dl>
+    <div class="edit-buttons">
+      <button class="btn btn-primary edit">Edit</button>
+      <button class="btn delete">Delete</button>
+    </div>
+  </div>
 </script>
 
 <!-- Edit contact template -->
 <script id="contactEditTemplate" type="text/template">
-  <form action="#">
-    <input type="file" value="{{ photo }}" />
-    <input class="name" value="{{ name }}" />
-    <input id="type" type="hidden" value="{{ type }}" />
-    <input class="address" value="{{ address }}" />
-    <input class="tel" value="{{ tel }}" />
-    <input class="email" value="{{ email }}" />
-    <button class="save">Save</button>
-    <button class="cancel">Cancel</button>
-  </form>
+  <div class="well">
+    <form action="#">
+      <input type="file" value="{{ photo }}" disabled="disabled"/>
+      <input type="text" class="name" value="{{ name }}" placeholder="Name" />
+      <input id="type" type="hidden" value="{{ type }}" />
+      <input type="text" class="address" value="{{ address }}" placeholder="Address"/>
+      <input type="text" class="tel" value="{{ tel }}" placeholder="Telephone #"/>
+      <input type="text" class="email" value="{{ email }}" placeholder="Email"/>
+      <div>
+        <button class="btn btn-primary save">Save</button>
+        <button class="btn cancel">Cancel</button>
+      </div>
+    </form>
+  </div>
 </script>
 
 <script type="text/javascript">

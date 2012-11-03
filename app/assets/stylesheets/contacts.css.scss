@@ -2,14 +2,18 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+.container {
+  margin-top: 100px;
+}
+.navbar .container {
+  margin-top: 0;
+}
+
 .contact-container {
-  float: left;
-  background-color: #e0ffff;
-  border: 1px solid #00ffff;
-  padding: 10px;
-  width: 430px;
-  margin: 10px;
-  height: 120px;
+
+  .well {
+    min-height: 200px;
+  }
 
   img {
     float: left;
@@ -18,11 +22,6 @@
 
   h1 {
     margin: 0 0 0 0;
-  }
-
-  h1 span {
-    float:right;
-    font-size: 12px;
   }
 
   dl {
@@ -43,14 +42,20 @@
     white-space: pre;
   }
 
-  .address {
-    min-height: 20px;
+  .edit-buttons {
+    margin-top: 10px;
   }
 
-  form {
-
-  }
 }
 #addContact {
   display: none;
+  padding-top: 50px;
+}
+
+@media (max-width: 767px) {
+  .contact-container {
+    .well {
+      min-height: 0;
+    }
+  }
 }
