@@ -1,66 +1,79 @@
-<div class="navbar navbar-fixed-top">
-
+<div class="navbar">
   <div class="navbar-inner">
     <div class="container">
     <div class="brand">Contacts App</div>
     </div>
   </div>
-
 </div>
 
 <div class="container">
   <div id="contacts" class="row">
-    <div class="span12">
-      <div class="well">
-        Filter:
-        <div id="filter">
-          <label>Show me:</label>
-        </div>
-        <a id="showForm" class="btn" href="#"><i class="icon-plus"></i>&nbsp;&nbsp;New Contact</a>
+    <div class="offset3 span6">
+      <div id="sticky-anchor"></div>
+      <div id="sticky" class="well span6">
+        <div class="row topspacing">
+          <div class="span2 textalignright">
+            <a href="#addContact" role="button" data-toggle="modal" class="btn"><i class="icon-plus"></i>&nbsp;&nbsp;New Contact</a>
+          </div>
+          <div class="span1 textalignright">
+            <label>Filter:</label>
+          </div>
+          <div class="span3">
+                  <div id="filter">
+                    <label>Show me:</label>
+                  </div>
+          </div>
+        </div>       
         <!-- Form to add a new contact -->
-        <form id="addContact" class="form-horizontal" action="#">
+        <form id="addContact" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
           <!--NOTE!: make sure id attributes match the attributes of the contact model.
-      Makes life easier that way-->
-          <div class="control-group">
-            <label class="control-label" for="photo">Photo:</label>
-            <div class="controls">
-              <input id="photo" type="file" disabled="disabled"/>
+      Makes life easier that way -->
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Modal header</h3>
+          </div>
+          <div class="modal-body">
+            <div class="control-group">
+              <label class="control-label" for="photo">Photo:</label>
+              <div class="controls">
+                <input id="photo" type="file" disabled="disabled"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label"  for="type">Type:</label>
+              <div class="controls">
+                <input id="type" type="text"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label"  for="name">Name:</label>
+              <div class="controls">
+                <input id="name" type="text"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label"  for="address">Address:</label>
+              <div class="controls">
+                <input id="address" type="text"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label"  for="tel">Tel:</label>
+              <div class="controls">
+                <input id="tel" type="text"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label"  for="email">Email:</label>
+              <div class="controls">
+                <input id="email" type="text" />
+              </div>
             </div>
           </div>
-          <div class="control-group">
-            <label class="control-label"  for="type">Type:</label>
-            <div class="controls">
-              <input id="type" type="text"/>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label"  for="name">Name:</label>
-            <div class="controls">
-              <input id="name" type="text"/>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label"  for="address">Address:</label>
-            <div class="controls">
-              <input id="address" type="text"/>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label"  for="tel">Tel:</label>
-            <div class="controls">
-              <input id="tel" type="text"/>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label"  for="email">Email:</label>
-            <div class="controls">
-              <input id="email" type="text" />
-            </div>
-          </div>
-          <div class="control-group">
-            <div class="controls">
-              <button id="add" class="btn btn-primary">Add</button>
-            </div>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            <button id="add" class="btn btn-primary">Add</button>
+            <!--<button class="btn btn-primary">Save changes</button>-->
           </div>
         </form>
       </div>
@@ -68,6 +81,30 @@
   </div>
 </div>
 
+
+<!-- If you have jQuery directly, then skip next line -->
+<script src="http://www.google.com/jsapi"></script>
+
+<script type="text/javascript">
+  // If you have jQuery directly, then skip next line
+  google.load("jquery", "1");
+
+  function sticky_relocate() {
+    var window_top = $(window).scrollTop();
+    var div_top = $('#sticky-anchor').offset().top;
+    if (window_top > div_top)
+      $('#sticky').addClass('stick')
+    else
+      $('#sticky').removeClass('stick');
+    }
+  // If you have jQuery directly, use the following line, instead
+  // $(function() {
+  // If you have jQuery via Google AJAX Libraries
+  google.setOnLoadCallback(function() {
+    $(window).scroll(sticky_relocate);
+    sticky_relocate();
+    });
+</script>
 
 <!-- Contact template
 The {{ }} will be replace by the attributes of a Contact model -->

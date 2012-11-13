@@ -3,11 +3,46 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 .container {
-  margin-top: 100px;
+  margin-top: 50px;
 }
 .navbar .container {
   margin-top: 0;
 }
+.navbar-inner {
+  border-radius: 0px;
+}
+
+.textalignright {
+  text-align: right;
+}
+
+.topspacing {
+  padding-top: 5px;
+}
+
+/* CSS FOR STICKY DIV AT TOP */
+#sticky {
+  background-color: #fff;
+  -moz-border-radius: 0.5ex;
+  -webkit-border-radius: 0.5ex;
+  border-radius: 0.5ex;
+  color: #000;
+  font-size: 2em;
+  padding: 0.5ex;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 40px;
+}
+
+#sticky.stick {
+  -moz-border-radius: 0 0 0.5em 0.5em;
+  -webkit-border-radius: 0 0 0.5em 0.5em;
+  border-radius: 0 0 0.5em 0.5em;
+  position: fixed;
+  top: 0;
+  z-index: 10000;
+}
+/* END CSS FOR STICKY DIV */
 
 .contact-container {
 
@@ -49,7 +84,6 @@
 }
 #addContact {
   display: none;
-  padding-top: 50px;
 }
 
 @media (max-width: 767px) {
